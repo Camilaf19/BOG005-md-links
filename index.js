@@ -1,27 +1,24 @@
 const fs = require('fs');
 const path = require('path');
+//const { marked } = require('marked');
 
 const pathFile = 'goodDirectory';
 console.log(pathFile)
 
-const absolutPath = (pathFile) => {
-  let absolutPath;
+const absolutePath = (pathFile) => {
+  let absolutePath;
   if (path.isAbsolute(pathFile)) {
-    absolutPath = pathFile;
+    absolutePath = pathFile;
   }
   else {
-    absolutPath = path.resolve(pathFile);
+    absolutePath = path.resolve(pathFile);
   }
-  return absolutPath
+  return absolutePath
 }
-console.log(absolutPath(pathFile))
+console.log(absolutePath(pathFile))
 
-
-
-
-
-function getFiles(pathFile) {
-  const realPath = absolutPath(pathFile)
+const getFiles = (pathFile) => {
+  const realPath = absolutePath(pathFile)
   let arrayPaths = [];
   //si es un archivo
   if (fs.statSync(realPath).isFile() === true && path.extname(realPath) === '.md') {
@@ -46,6 +43,26 @@ function getFiles(pathFile) {
 }
 console.log(getFiles(pathFile));
 
-module.exports = {
+const readFiles = (arrayPaths) => {
+  return new Promise((resolve, reject) => {
+    arrayPaths.forEach(file => {
+      fs.readFile(file, "utf8", (err, data) => {
+        if (err) {
+          reject(err)
+        } else {
+          resolve(data);
+        }
 
+      });
+    })
+  })
 }
+
+readFiles(getFiles(pathFile)).then((data) => {
+  console.log(data)
+
+})
+  
+
+
+module.exports = { absolutePath, getFiles }
