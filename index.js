@@ -2,8 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 
-const pathFile = 'prueba.md';
-// console.log(pathFile)
+const pathFile = 'goodDirectory';
 
 const absolutePath = (pathFile) => {
   let absolutePath;
@@ -15,7 +14,7 @@ const absolutePath = (pathFile) => {
   }
   return absolutePath
 }
-// console.log(absolutePath(pathFile))
+
 
 const getFiles = (pathFile) => {
   const realPath = absolutePath(pathFile)
@@ -31,7 +30,7 @@ const getFiles = (pathFile) => {
       let pathDirectory = path.join(realPath, file);
       if (fs.statSync(realPath).isDirectory() === true) {
         arrayPaths = arrayPaths.concat(getFiles(pathDirectory))
-       // console.log(file, "aqui lo recorrió")
+        // console.log(file, "aqui lo recorrió")
       } else {
         if (path.extname(pathDirectory) === ".md") {
           arrayPaths.push(pathDirectory);
@@ -41,9 +40,11 @@ const getFiles = (pathFile) => {
   }
   return arrayPaths;
 }
-// console.log(getFiles(pathFile));
+
+//console.log(getFiles(pathFile))
 
 const marked = require('marked');
+const arrayPaths = getFiles(pathFile);
 
 const readFiles = (arrayPaths) => {
   return new Promise((resolve, reject) => {
@@ -73,12 +74,26 @@ const readFiles = (arrayPaths) => {
   })
 }
 
-// const arrayMds = getFiles(pathFile)
-// // console.log('arrarMDS: ', arrayMds);
-// readFiles(arrayMds).then((data) => {
-//   console.log('read files index: ',data)
-// })
+
+const fetch = require('node-fetch');
+
+ const validateLinks = (arrayInfo) => {
+  const linkStatus = arrayInfo.map((data) => {
+    return fetch(data.href)
+      .then(promise => {
+        data.status = promise.status;
+        data.message = promise.status <= 399 ? 'Ok' : 'Fail';
+        return data;
+      })
+      .catch((error) => { 
+      data.status = 'Not found' + " " + error;
+        data.message = 'Fail';
+        return data;
+      })
+  })
+  return Promise.all(linkStatus);
+}
 
 
 
-module.exports = { absolutePath, getFiles, readFiles }
+module.exports = { absolutePath, getFiles, readFiles, validateLinks  }
