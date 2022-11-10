@@ -7,5 +7,31 @@
   "dependencies": {
     "marked": "^4.1.1",
     "node-fetch": "^2.6.7"
-  }
+  },
+  "scripts": {
+    "test": "jest --coverage --verbose"
+  },
+  "devDependencies": {
+    "jest": "^29.3.1",
+    "ts-node": "^10.9.1"
+  },
+  "main": "md-links.js",
+  "directories": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Camilaf19/BOG005-md-links.git"
+  },
+  "keywords": [
+    "(libray",
+    "npm",
+    "markdown)"
+  ],
+  "author": " (Camila Fonseca)",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Camilaf19/BOG005-md-links/issues"
+  },
+  "homepage": "https://github.com/Camilaf19/BOG005-md-links#readme"
 }

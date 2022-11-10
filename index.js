@@ -2,19 +2,18 @@ const fs = require('fs');
 const path = require('path');
 
 
-const pathFile = 'goodDirectory';
+const pathFile = 'prueba.md';
 
 const absolutePath = (pathFile) => {
   let absolutePath;
-  if (path.isAbsolute(pathFile)) {
-    absolutePath = pathFile;
+  if (!path.isAbsolute(pathFile)) {
+    absolutePath = path.resolve(pathFile);
   }
   else {
-    absolutePath = path.resolve(pathFile);
+    absolutePath = pathFile;
   }
   return absolutePath
 }
-
 
 const getFiles = (pathFile) => {
   const realPath = absolutePath(pathFile)
@@ -30,7 +29,7 @@ const getFiles = (pathFile) => {
       let pathDirectory = path.join(realPath, file);
       if (fs.statSync(realPath).isDirectory() === true) {
         arrayPaths = arrayPaths.concat(getFiles(pathDirectory))
-        // console.log(file, "aqui lo recorrió")
+       
       } else {
         if (path.extname(pathDirectory) === ".md") {
           arrayPaths.push(pathDirectory);
@@ -44,13 +43,12 @@ const getFiles = (pathFile) => {
 //console.log(getFiles(pathFile))
 
 const marked = require('marked');
-const arrayPaths = getFiles(pathFile);
+//const arrayPaths = getFiles(pathFile);
 
-const readFiles = (arrayPaths) => {
+const readFiles = (file) => {
   return new Promise((resolve, reject) => {
     let arrayLinks = [];
-    arrayPaths.forEach(file => {
-      fs.readFile(file, "UTF-8", (err, data) => {
+   fs.readFile(file, "UTF-8", (err, data) => {
         if (err) {
           reject(err)
         } else {
@@ -67,22 +65,29 @@ const readFiles = (arrayPaths) => {
 
           }
           marked.marked(data, { renderer })
-          resolve(arrayLinks)
+         
         }
+        resolve(arrayLinks)
       })
-    })
+   
   })
 }
 
+const readAllFiles = (arrayLinks) => {
+  let arrayPaths = arrayLinks.map((file) => {
+    return readFiles(file)
+  })
+  return Promise.all(arrayPaths).then(response => response.flat())
+}
 
 const fetch = require('node-fetch');
 
- const validateLinks = (arrayInfo) => {
-  const linkStatus = arrayInfo.map((data) => {
+ const validateLinks = (arrayLinks) => {
+  const linkStatus = arrayLinks.map((data) => {
     return fetch(data.href)
-      .then(promise => {
-        data.status = promise.status;
-        data.message = promise.status <= 399 ? 'Ok' : 'Fail';
+      .then(element => {
+        data.status = element.status;
+        data.message = element.status <= 399 ? 'Ok' : 'Fail';
         return data;
       })
       .catch((error) => { 
@@ -94,6 +99,26 @@ const fetch = require('node-fetch');
   return Promise.all(linkStatus);
 }
 
+function statsLinks(arrayLinks) {
+  return {
+      "Total": arrayLinks.length,
+      "Unique": new Set(arrayLinks.map((link) => link.href)).size
+  }    
+}
 
+const totalStatsLinks = (arrayLinks) => {
+  const brokens = arrayLinks.filter((link) => link.message === 'Fail').length;
+  return {
+    "Total": arrayLinks.length,
+    "Unique": new Set(arrayLinks.map((link) => link.href)).size,
+    "Broken": brokens,
+} 
+}
 
-module.exports = { absolutePath, getFiles, readFiles, validateLinks  }
+module.exports = { 
+  absolutePath, 
+  getFiles, 
+  readAllFiles, 
+  validateLinks, 
+  statsLinks, 
+totalStatsLinks }
