@@ -100,12 +100,12 @@ Broken: 1
 
 Write the command line run bellow to install the module:
   ```
-  npm install ..
+  npm i camilaf-md-links
   ```
 
 This module includes an executable as an interface that can be imported with `require`.
  ```
-  const {mdLinks} = require('..')
+  const {mdLinks} = require('camilaf-md-links')
   ```
 
 To run it from the CLI:
