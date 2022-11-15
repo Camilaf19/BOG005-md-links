@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 
-
 const pathFile = 'prueba.md';
 
 const absolutePath = (pathFile) => {
