@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const { statsLinks, totalStatsLinks } = require("./index.js");
 const { mdLinks } = require("./md-links.js");
 
